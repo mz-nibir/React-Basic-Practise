@@ -20,32 +20,42 @@ class App extends Component {
     super();
     this.state = {
       books: [
-        { bookName: "1984", writter: "orwell" },
-        { bookName: "The Da", writter: "Dan Brown" },
-        { bookName: "Alchemist", writter: "Paulo" }
+        { id: 1, bookName: "1984", writter: "orwell" },
+        { id: 2, bookName: "The Da", writter: "Dan Brown" },
+        { id: 3, bookName: "Alchemist", writter: "Paulo" }
       ],
-      anotherProperty: "some text"
+      showBooks: true
     }
   }
-  changeBookstate = (newpara) => {
+  deleteBookState = (index) => {
+    //get all books
+    const books = this.state.books.slice();
+    //delete books
+    books.splice(index, 1);
     this.setState({
-      books: [
-        { bookName: newpara, writter: "Nibir" },
-        { bookName: "The Da", writter: "Dan Brown" },
-        { bookName: "meta", writter: "franz" }
-      ]
-
+      books: books
     });
+
+
   }
-  changeWithinputState = (e) => {
-    this.setState({
-      books: [
-        { bookName: e.target.value, writter: "Nibir" },
-        { bookName: "The Da", writter: "Dan Brown" },
-        { bookName: "meta", writter: "franz" }
-      ]
 
+  changeWithinputState = (e, index) => {
+    const book = {
+      ...this.state.books[index]
+    }
+    book.bookName = e.target.value;
+    const books = [...this.state.books];
+    books[index] = book;
+
+    this.setState({
+      books: books
     });
+
+
+  }
+  toggleBooks = () => {
+    this.setState({ showBooks: !this.state.showBooks })
+
 
   }
 
@@ -56,23 +66,31 @@ class App extends Component {
       backgroundColor: "black",
       color: "blue"
     }
+    let books = null;
+    if (this.state.showBooks) {
+      const bookState = this.state.books;
+      books = bookState.map((book, index) => {
+        return (
+          <Book
+            bookName={book.bookName}
+            writter={book.writter}
+            delete={() => this.deleteBookState(index)}
+            key={book.id}
+            inputName={(event) => this.changeWithinputState(event, index)}
+          />
+        )
+
+      })
+
+    }
+
+    // console.log(books);
     return (
       <div className="App">
         <h1 style={style}>Book List</h1>
-        <button onClick={this.changeBookstate.bind(this, "new Book")} >Change State</button>
-        <input type="text" onChange={this.changeWithinputState} />
-        <Book
-          bookName={this.state.books[0].bookName}
-          writter={this.state.books[0].writter}
-          inputName={this.changeWithinputState} />
-        <Book
-          bookName={this.state.books[1].bookName}
-          writter={this.state.books[1].writter} />
-        <Book
-          bookName={this.state.books[2].bookName}
-          writter={this.state.books[2].writter}
-          change={() => this.changeBookstate("84")}
-        />
+        <button onClick={this.toggleBooks} >Toggle books</button>
+        {books}
+
 
       </div>
     );
